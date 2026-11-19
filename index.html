@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#101015">
+  <meta name="color-scheme" content="dark">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Comics">
+  <meta name="description" content="Comics: your private comic library, reading history, page turns and optional read-only Google Drive imports.">
+  <!-- GitHub Pages cannot set CSP response headers, so apply a best-effort meta policy. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'none'; object-src 'none'; script-src 'self' https://accounts.google.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://accounts.google.com; connect-src 'self' https://www.googleapis.com https://accounts.google.com; frame-src https://accounts.google.com; worker-src 'self'; form-action 'self' https://accounts.google.com; upgrade-insecure-requests">
+  <meta name="referrer" content="no-referrer">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/icon-180.png">
+  <link rel="icon" type="image/png" href="assets/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+  <title>Comics · Comic Reader</title>
+</head>
+<body>
+<div id="app" class="app">
+  <header class="app-header">
+    <div class="brand"><div class="brand-symbol" aria-hidden="true"><span></span><span></span><span></span></div><span>comics<span class="brand-period">.</span></span></div>
+    <button class="icon-btn header-settings" id="settings-shortcut" aria-label="Settings" title="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2 2-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.05 1.57V21h-2.8v-.09A1.7 1.7 0 0 0 10.96 19a1.7 1.7 0 0 0-1.88.34l-.06.06-2-2 .06-.06A1.7 1.7 0 0 0 7.42 15a1.7 1.7 0 0 0-1.57-1.05H5v-2.8h.85A1.7 1.7 0 0 0 7.42 10a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2-2 .06.06a1.7 1.7 0 0 0 1.88.34A1.7 1.7 0 0 0 12 4.85V4h2.8v.85A1.7 1.7 0 0 0 15.85 6a1.7 1.7 0 0 0 1.88-.34l.06-.06 2 2-.06.06A1.7 1.7 0 0 0 19.4 10a1.7 1.7 0 0 0 1.57 1.05H21v2.8h-.03A1.7 1.7 0 0 0 19.4 15Z" transform="translate(-1.4 -0.4) scale(1.08)"/></svg></button>
+  </header>
+  <main>
+    <section class="view active" id="library-view" aria-label="Library">
+      <div class="intro-top"><div class="eyebrow"><span class="eyebrow-line"></span> YOUR PERSONAL COLLECTION</div><h1>Every story.<br><em>Your way.</em></h1><p>One quiet place for all the worlds you love.</p></div>
+      <div class="drive-banner" id="drive-banner"><div class="drive-glyph" aria-hidden="true"><svg viewBox="0 0 32 32"><path fill="#45b76e" d="m11.5 3 6.5 0 11.5 20-6.5 0z"/><path fill="#f6c64e" d="m2 23 3.4-5.7h23.7L25.7 23z"/><path fill="#4385f5" d="M2 23 13.5 3H20L8.5 23z"/></svg></div><div class="drive-banner-text"><b>Bring your comics closer</b><span id="drive-banner-caption">Connect Google Drive to find your collection.</span></div><button class="round-arrow" id="drive-banner-button" aria-label="Open Google Drive">↗</button></div>
+      <div class="reading-summary" aria-label="Reading statistics">
+        <div class="stat-tile"><strong id="stat-read">0</strong><span>Comics read</span></div>
+        <div class="stat-tile"><strong id="stat-reading">0</strong><span>Reading</span></div>
+        <div class="stat-tile"><strong id="stat-unread">0</strong><span>Unread</span></div>
+      </div>
+      <section class="up-next-section hidden" id="up-next-section" aria-label="Up Next">
+        <div class="eyebrow small">KEEP THE STORY GOING</div><h2>Up <em>Next.</em></h2>
+        <p class="up-next-hint">Your next available issue, based on comics you’ve finished.</p>
+        <div id="up-next-list" class="up-next-list"></div>
+      </section>
+      <div class="section-heading"><div><div class="eyebrow small">THE BOOKSHELF</div><h2>Your library <span class="book-count" id="book-count">0</span></h2></div><label class="add-button" for="local-picker" title="Import CBZ or ZIP">＋ <span>Add</span></label></div>
+      <div class="search-wrap"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m16 16 5 5"/></svg><input id="library-search" type="search" placeholder="Search your collection" autocomplete="off" aria-label="Search library"></div>
+      <div class="filter-line"><button class="chip selected" data-filter="all">All comics</button><button class="chip" data-filter="reading">In progress</button><button class="chip" data-filter="finished">Finished</button></div>
+      <div id="library-grid" class="library-grid"></div>
+      <div id="empty-state" class="empty-state hidden"><div class="empty-art"><span></span><span></span><span></span></div><h3>Good stories belong here.</h3><p>Add a CBZ comic or open the included sample to see Comics in action.</p><label class="primary-btn center" for="local-picker">Import a comic</label><button class="text-link" id="load-demo-empty">Open the sample comic</button></div>
+    </section>
+    <section class="view" id="drive-view" aria-label="Google Drive">
+      <div class="eyebrow"><span class="eyebrow-line"></span> YOUR CLOUD LIBRARY</div><h1 class="view-title">From the <em>cloud.</em></h1><p class="view-subtitle">Read comics directly from Google Drive using small on-demand downloads.</p>
+      <div id="drive-disconnected" class="connect-panel"><div class="connect-orbit"><div class="drive-glyph large" aria-hidden="true"><svg viewBox="0 0 32 32"><path fill="#45b76e" d="m11.5 3 6.5 0 11.5 20-6.5 0z"/><path fill="#f6c64e" d="m2 23 3.4-5.7h23.7L25.7 23z"/><path fill="#4385f5" d="M2 23 13.5 3H20L8.5 23z"/></svg></div></div><h2>Your comics, anywhere.</h2><p>Connect through Google to browse and import comics. Permission is read-only, but covers <strong>all files in your Drive</strong>, not only comics. Your cloud files are never changed.</p><button id="connect-drive" class="primary-btn full">Connect Google Drive <span>↗</span></button><p class="tiny-muted" id="drive-connect-hint">Requires your own OAuth Client ID in Settings.</p></div>
+      <div id="drive-connected" class="hidden"><div class="connected-line"><span class="status-led"></span><span>Google Drive connected</span><button id="disconnect-drive" class="small-plain">Disconnect</button></div><div class="drive-path" id="drive-path"></div><div id="drive-files" class="drive-file-list"></div><div id="drive-empty" class="drive-empty hidden">Nothing here yet. Open a folder containing CBZ or ZIP comics.</div></div>
+      <div class="tip-box"><b>Another way to import</b><p>If Google Drive appears in iPhone Files, select a comic with the <strong>Add</strong> button without signing in here. Files over 100 MB stream from their local file and must be re-selected after reopening the app.</p></div>
+    </section>
+    <section class="view" id="settings-view" aria-label="Settings">
+      <div class="eyebrow"><span class="eyebrow-line"></span> MAKE IT YOURS</div><h1 class="view-title">Reading, <em>refined.</em></h1><p class="view-subtitle">A few small details that make turning pages feel right.</p>
+      <div class="settings-section"><div class="settings-title">READER</div><div class="setting-row"><div><b>Page transition</b><small>How each page moves</small></div><div class="segmented" id="transition-options"><button data-transition="slide">Slide</button><button data-transition="curl">Turn</button></div></div><div class="setting-row"><div><b>Reading direction</b><small>Left to right or manga style</small></div><div class="segmented" id="direction-options"><button data-direction="ltr">LTR</button><button data-direction="rtl">RTL</button></div></div><div class="setting-row"><div><b>Page fitting</b><small>Fit the whole page or fill width</small></div><div class="segmented" id="fit-options"><button data-fit="contain">Page</button><button data-fit="width">Width</button></div></div><div class="setting-row"><div><b>Page layout</b><small>Two-page spreads work best in landscape</small></div><div class="segmented" id="spread-options"><button data-spread="single">1 page</button><button data-spread="two">2 pages</button><button data-spread="auto">Auto</button></div></div></div>
+      <div class="settings-section"><div class="settings-title">GOOGLE DRIVE</div><label class="setting-label" for="oauth-client-id">Google OAuth Client ID</label><input id="oauth-client-id" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="123…apps.googleusercontent.com"><p class="setting-help">The public Client ID is saved locally. Access tokens are held only in memory, never saved or sent to our servers. Google requires this site's HTTPS origin to be authorized. The read-only permission can view every Drive file and may require verification beyond personal testing.</p><button class="outline-btn" id="save-client">Save Client ID</button><a class="docs-link" href="https://console.cloud.google.com/auth/clients" target="_blank" rel="noopener noreferrer">Google Cloud credentials ↗</a><p class="security-help">Only authorize a copy of Comics hosted on a website you control. Disconnecting revokes the token. <a href="https://myaccount.google.com/connections" target="_blank" rel="noopener noreferrer">Review Google account access</a>.</p></div>
+      <div class="settings-section"><div class="settings-title">LARGE COMICS</div><p class="setting-help">CBZ/ZIP archives up to 3 GiB are indexed without loading the entire archive. Only the current page and nearby pages are decompressed (48 MB maximum per page). Comics from Google Drive use HTTP byte-range streaming and require an active connection; local files over 100 MB must be selected again after the app restarts. Your phone must still be able to decode each image, so performance cannot be guaranteed for every file on iPhone 7.</p></div><div class="settings-section"><div class="settings-title">STORAGE</div><div class="setting-row"><div><b>Local comics</b><small id="storage-info">Loading…</small></div><button id="remove-finished" class="small-plain">Clean up</button></div></div>
+      <div class="settings-footer">COMICS <span>·</span> V2.0<br>Made for comics, not distractions.</div>
+    </section>
+  </main>
+  <nav class="tab-bar" aria-label="Main navigation"><button class="nav-item active" data-view="library"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="5" height="15" rx="1"/><rect x="10" y="3" width="5" height="17" rx="1"/><rect x="17" y="7" width="4" height="13" rx="1"/></svg><span>Library</span></button><button class="nav-item" data-view="drive"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18h11a4 4 0 0 0 .5-8A7 7 0 0 0 5.2 9.8 4.2 4.2 0 0 0 7 18Z"/></svg><span>Drive</span></button><button class="nav-item" data-view="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M4.5 11a8 8 0 0 1 15 0M4.5 13a8 8 0 0 0 15 0M12 3v3M12 18v3M3 12h3M18 12h3"/></svg><span>Settings</span></button></nav>
+</div>
+<div id="reader" class="reader hidden" aria-label="Comic reader" role="dialog" aria-modal="true"><div id="reader-stage" class="reader-stage" aria-label="Swipe horizontally or tap to turn pages"><div id="reader-under" class="page-layer"><div id="reader-under-content" class="spread-content"><img id="reader-under-img" alt=""><img id="reader-under-img2" alt=""></div></div><div id="reader-over" class="page-layer"><div id="reader-over-content" class="spread-content"><img id="reader-over-img" alt="Comic page"><img id="reader-over-img2" alt="Second comic page"></div></div><div id="reader-loading" class="reader-loading hidden"><span class="spinner"></span>Loading page…</div></div><div class="reader-top" id="reader-top"><button id="close-reader" class="reader-icon" aria-label="Back to library">←</button><div class="reader-title-wrap"><b id="reader-title">Comic</b><span id="reader-chapter">Swipe to turn pages</span></div><button id="reader-menu" class="reader-icon" aria-label="Toggle one- or two-page view">▣</button></div><div class="reader-bottom" id="reader-bottom"><div class="reader-progress-info"><span id="reader-page-label">1 / 1</span><span id="reader-percent">0% read</span></div><input type="range" id="reader-slider" min="1" max="1" value="1" aria-label="Jump to page"><div class="reader-bottom-hint">‹ <span id="reader-gesture-hint">Swipe to turn · Double tap to zoom</span> ›</div></div></div>
+<div id="book-details" class="details-modal hidden" role="dialog" aria-modal="true" aria-labelledby="details-name">
+  <div id="details-backdrop" class="details-backdrop"></div>
+  <div class="details-panel">
+    <div class="details-panel-head"><div><div class="eyebrow small">COMIC DETAILS</div><h2 id="details-name">Comic title</h2><p id="details-status">Not started</p></div><button id="details-close" class="reader-icon" aria-label="Close details">×</button></div>
+    <div class="details-grid"><label>Series name<input id="details-series" type="text" maxlength="180" placeholder="e.g. Batman (2022)" autocomplete="off"></label><label>Issue #<input id="details-issue" type="number" min="1" max="9999" step="1" inputmode="numeric" placeholder="e.g. 2"></label></div>
+    <p class="details-hint">Up Next connects consecutive issues in the same series. We try to identify them from filenames; correct them here when needed.</p>
+    <div class="details-grid"><label>Started reading<input id="details-started" type="date"></label><label>Finished reading<input id="details-finished" type="date"></label></div>
+    <p class="details-hint">Dates are recorded automatically for new reads. Older imported history may show no date, but you can add one here.</p>
+    <button class="primary-btn full details-save" id="details-save">Save details <span>✓</span></button>
+    <div class="details-actions"><button id="details-mark-read" class="outline-btn">Mark finished today</button><button id="details-reset" class="small-plain">Reset progress</button></div>
+  </div>
+</div>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<input type="file" id="local-picker" accept=".cbz,.zip,application/zip" multiple hidden>
+<div id="busy-overlay" class="busy-overlay hidden"><span class="spinner"></span><b id="busy-title">Importing comic…</b><small id="busy-desc">Unpacking pages</small></div>
+<script src="lib/pako_inflate.min.js"></script>
+<script src="zip-reader.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="app.js" defer></script>
+</body>
+</html>
