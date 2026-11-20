@@ -1,6 +1,6 @@
-# Comics — iPhone Comic Reader (v2.0)
+# Comics — iPhone Comic Reader (v4.0)
 
-**Comics** is a dark-themed, installable web app (PWA) for reading CBZ / ZIP comic archives on an iPhone 7 (iOS 15) or a desktop browser. It runs entirely in the browser, needs no Mac or App Store account, and has **no server-side account, advertising, tracking or analytics**.
+**Comics** is a dark-themed, installable web app (PWA) for reading CBZ / CBR / ZIP comic archives on an iPhone 7 (iOS 15) or a desktop browser. It runs entirely in the browser, needs no Mac or App Store account, and has **no server-side account, advertising, tracking or analytics**.
 
 ## What's included
 
@@ -23,6 +23,14 @@
 6. Tap **Add** in Library to select CBZ/ZIP files using iOS Files.
 
 If installing or Drive authorization doesn't work in Home Screen mode, try the same HTTPS website in Safari first. iOS may keep separate data for Safari and Home Screen apps.
+
+## CBR (RAR) support — important limits
+
+CBR support is integrated using **libarchive.js 2.0.2** (MIT license) and a dedicated browser Web Worker. It recognizes RAR4 and RAR5, lists JPG/PNG/WebP/GIF images, and extracts one page at a time after opening the RAR container. No comic is uploaded to a decoder service.
+
+**CBR is capped at 128 MiB**, independently of the **3 GiB CBZ** target. The underlying RAR decoder must first load the CBR into WASM memory, unlike the existing indexed ZIP reader. This is a compatibility/safety limit for iPhone 7, not support for 3 GiB CBR. For larger CBR comics, convert to CBZ on a computer. Password-protected and multi-volume RAR are not supported. iOS 15 memory limits may still prevent a file below 128 MiB from opening.
+
+CBR can be imported from the iPhone Files picker (including the Google Drive Files provider). Direct byte-range streaming from within the in-app Google Drive browser **only supports CBZ**. The decoder's WebAssembly binary is fetched from pinned `https://cdn.jsdelivr.net/npm/libarchive.js@2.0.2/dist/libarchive.wasm` on first use, so initial CBR reading requires internet; the script itself is hosted in the repository. Treat the external pinned WASM as a third-party dependency, not a security-audited component.
 
 ## How 3 GiB comics work
 
@@ -75,3 +83,10 @@ Visit `http://localhost:8000/` to test local imports and the sample. To test Dri
 The app is plain HTML, CSS and JavaScript: no build tools or app backend. Metadata and reading history use IndexedDB (`folio-comics-1`, **intentionally retaining the old database name** so users upgrading from Folio don't lose their library). The v2 reader uses a custom ZIP central-directory reader and vendored **pako 1.0.11** inflation library (MIT AND Zlib, license included in `lib/PAKO-LICENSE.txt`). Google OAuth uses the Google-hosted GIS script.
 
 **Checks performed:** syntax checks on JavaScript files; successful extraction of the included compressed sample CBZ; a fabricated *almost-3-GiB* archive indexed and accessed with ~66 KB read (verifies the random-access architecture, **not** a physical device performance benchmark); and issue-number / Up Next logic tests. **Not verified yet:** Google sign-in against an actual configured OAuth project, cloud range/CORS behavior on iOS 15, full browser integration/UI flow, or real iPhone 7 performance. iOS file-provider limitations and unusually high-resolution pages may still require improvements.
+
+
+## v4 deployment notes
+
+The repository now includes `rar-reader.js`, `vendor/libarchive.js`, `vendor/worker-bundle.js`, `lib/pako_inflate.min.js` (missing from the earlier deployed ZIP reader), and `assets/icon.svg`. `service-worker.js` uses a new cache version. Refresh the site in Safari once after deployment. Never clear your website data to troubleshoot without first backing up your reading history.
+
+The earlier sample comic binary was not present in the GitHub repository, so the sample button still cannot open it on this deployment. This does not affect your own CBZ/CBR files.
