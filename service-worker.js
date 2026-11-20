@@ -1,5 +1,5 @@
-const CACHE = 'comics-shell-v2.0.0';
-const SHELL = ['./','./index.html','./styles.css','./app.js','./manifest.webmanifest','./zip-reader.js','./lib/pako_inflate.min.js','./assets/icon-192.png','./assets/icon-512.png','./assets/icon-180.png','./assets/demo.cbz'];
+const CACHE = 'comics-shell-v4.0.0';
+const SHELL = ['./','./index.html','./styles.css','./app.js','./manifest.webmanifest','./zip-reader.js','./rar-reader.js','./vendor/libarchive.js','./vendor/worker-bundle.js','./lib/pako_inflate.min.js'];
 self.addEventListener('install', event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(SHELL)).then(() => self.skipWaiting()));
 });
