@@ -570,6 +570,7 @@ function bindEvents(){
  $('#details-mark-read').addEventListener('click',()=>markFinishedToday().catch(e=>toast(e.message)));
  $('#details-reset').addEventListener('click',()=>resetReadingProgress().catch(e=>toast(e.message)));
  $('#load-demo-empty').addEventListener('click',loadDemo);
+ $('#choose-drive-files').addEventListener('click',()=>{state.relinkId=null;$('#local-picker').click();});
  $('#connect-drive').addEventListener('click',connectDrive);
  $('#disconnect-drive').addEventListener('click',disconnectDrive);
  $('#drive-path').addEventListener('click',e=>{const el=e.target.closest('[data-path]');if(!el)return;state.driveStack=state.driveStack.slice(0,Number(el.dataset.path)+1);listDriveFolder();});
