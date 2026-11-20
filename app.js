@@ -16,10 +16,18 @@ const state = { db:null, books:[], filter:'all', query:'', activeView:'library',
   driveStack:[{id:'root',name:'My Drive'}], reader:null, toastTimeout:null, detailsId:null,
   connectAttempt:0, driveRequests:new Set(), sessionFiles:new Map(), relinkId:null, driveFiles:new Map() };
 const ALLOWED = /\.(jpg|jpeg|png|webp|gif)$/i; // Avoid untrusted active SVG content.
-const ARCHIVE = /\.(cbz|zip)$/i;
+const ARCHIVE = /\.(cbz|cbs|cbr|zip)$/i;
+ const isRar = name => /\.cbr$/i.test(name);
+ async function openComicArchive(source,name){
+   if(isRar(name)){
+     if(!(source instanceof Blob))throw new Error('To read a CBR from Google Drive, use Add → Files → Google Drive. Direct Drive streaming is CBZ-only.');
+     return ComicsRar.open(source);
+   }
+   return ComicsZip.open(source instanceof Blob?ComicsZip.sourceFromBlob(source):source);
+ }
 const MIME_FOLDER = 'application/vnd.google-apps.folder';
 function escapeHTML(s) { return String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function filenameTitle(name) { return name.replace(/\.(cbz|zip)$/i,'').replace(/[_]+/g,' ').trim(); }
+function filenameTitle(name) { return name.replace(/\.(cbz|cbs|cbr|zip)$/i,'').replace(/[_]+/g,' ').trim(); }
 function detectSeries(name){
  const clean=name.replace(/\[[^\]]*\]/g,' ').replace(/\s+/g,' ').trim();
  let match=clean.match(/^(.*?)\s*(?:#\s*|(?:issue|part|chapter)\s+)(\d{1,4})(?=\D|$)/i);
@@ -200,16 +208,18 @@ async function coverFromArchive(archive){
  }catch(e){return '';}finally{URL.revokeObjectURL(objectUrl);}
 }
 async function addComic(sourceOrBlob,name,origin='local',driveId=null,openAfter=false){
- if(!ARCHIVE.test(name))throw new Error('Only CBZ/ZIP comic archives are supported.');
+ if(!ARCHIVE.test(name))throw new Error('Select a CBZ, CBR, CBS or ZIP comic archive.');
  const size=sourceOrBlob.size;
- if(size>ComicsZip.LIMIT)throw new Error('Maximum CBZ size is 3 GiB.');
+ if(size>(isRar(name)?ComicsRar.LIMIT:ComicsZip.LIMIT))throw new Error(isRar(name)?'CBR supports up to 128 MiB on iPhone; use CBZ for larger comics.':'CBZ supports archives up to 3 GiB.');
  const existing=driveId&&state.books.find(book=>book.driveId===driveId);
  if(existing){if(openAfter)await openReader(existing.id);else toast('Already in your library.');return existing;}
  const blob=sourceOrBlob instanceof Blob?sourceOrBlob:null;
  const source=blob?ComicsZip.sourceFromBlob(blob):sourceOrBlob;
  busy('Indexing comic…','Reading the archive directory, not unpacking the whole file');
  try{
-  const archive=await ComicsZip.open(source),cover=await coverFromArchive(archive);
+  const archive=await openComicArchive(blob||source,name);
+   let cover;
+   try{cover=await coverFromArchive(archive);}finally{if(archive.close)await archive.close();}
   const title=filenameTitle(name),detected=detectSeries(title);
   const stream=(!blob||size>100*1024*1024);
   const actualOrigin=!blob?'drive-stream':stream?'local-stream':origin;
@@ -339,7 +349,8 @@ async function downloadDriveFile(id,name){
   const old=state.books.find(b=>b.driveId===id);if(old){await openReader(old.id);return;}
   const info=state.driveFiles.get(id);if(!info)throw new Error('Drive file metadata is unavailable. Refresh this folder.');
   const size=Number(info.size);
-  if(!Number.isSafeInteger(size)||size>ComicsZip.LIMIT)throw new Error('Comics supports Drive files up to 3 GiB.');
+  if(isRar(name))throw new Error('For CBR files, tap Add and choose Google Drive in the iPhone Files picker. Browser streaming only supports CBZ.');
+   if(!Number.isSafeInteger(size)||size>ComicsZip.LIMIT)throw new Error('Comics supports Drive CBZ files up to 3 GiB.');
   await addComic(sourceForDrive(id,size),name,'drive',id,true);
  }catch(e){idle();toast(e.message||'Could not open the Drive comic.');}
 }
@@ -430,7 +441,7 @@ async function openReader(id){
  }
  busy('Opening '+book.name,'Reading comic index');
  try{
-  const archive=await ComicsZip.open(source),paths=archive.entries.map(e=>e.name);
+  const archive=await openComicArchive(book.origin==='drive-stream'?source:(book.origin==='local-stream'?state.sessionFiles.get(id):(await idb('get','archives',id)).blob),book.originalName),paths=archive.entries.map(e=>e.name);
   if(state.reader)closeReader();
   const r={id,book,archive,paths,page:0,cache:new Map(),pageSizes:new Map(),pending:new Map(),busy:false,gesture:null,zoom:1,panX:0,panY:0,lastTap:0};
   state.reader=r;$('#reader-title').textContent=book.name;$('#reader').classList.remove('hidden','ui-hidden');document.body.style.overflow='hidden';
@@ -440,6 +451,7 @@ async function openReader(id){
 function closeReader(){
  const r=state.reader;if(!r)return;r.destroyed=true;state.reader=null;
  r.cache.forEach(url=>URL.revokeObjectURL(url));r.cache.clear();r.pageSizes.clear();
+  if(r.archive.close)r.archive.close().catch(()=>{});
  $('#reader').classList.add('hidden');document.body.style.overflow='';
  ['#reader-over-img','#reader-over-img2','#reader-under-img','#reader-under-img2'].forEach(sel=>$(sel).removeAttribute('src'));
  reloadBooks().catch(()=>{});
