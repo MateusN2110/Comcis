@@ -46,7 +46,7 @@
     </section>
     <section class="view" id="drive-view" aria-label="Google Drive">
       <div class="eyebrow"><span class="eyebrow-line"></span> YOUR CLOUD LIBRARY</div><h1 class="view-title">From the <em>cloud.</em></h1><p class="view-subtitle">Read comics directly from Google Drive using small on-demand downloads.</p>
-      <div id="drive-disconnected" class="connect-panel"><div class="connect-orbit"><div class="drive-glyph large" aria-hidden="true"><svg viewBox="0 0 32 32"><path fill="#45b76e" d="m11.5 3 6.5 0 11.5 20-6.5 0z"/><path fill="#f6c64e" d="m2 23 3.4-5.7h23.7L25.7 23z"/><path fill="#4385f5" d="M2 23 13.5 3H20L8.5 23z"/></svg></div></div><h2>Your comics, anywhere.</h2><p>Connect through Google to browse and import comics. Permission is read-only, but covers <strong>all files in your Drive</strong>, not only comics. Your cloud files are never changed.</p><button id="connect-drive" class="primary-btn full">Connect Google Drive <span>↗</span></button><p class="tiny-muted" id="drive-connect-hint">Requires your own OAuth Client ID in Settings.</p></div>
+      <div id="drive-disconnected" class="connect-panel"><div class="connect-orbit"><div class="drive-glyph large" aria-hidden="true"><svg viewBox="0 0 32 32"><path fill="#45b76e" d="m11.5 3 6.5 0 11.5 20-6.5 0z"/><path fill="#f6c64e" d="m2 23 3.4-5.7h23.7L25.7 23z"/><path fill="#4385f5" d="M2 23 13.5 3H20L8.5 23z"/></svg></div></div><h2>Your comics, anywhere.</h2><p>Connect through Google to browse and import comics. Permission is read-only, but covers <strong>all files in your Drive</strong>, not only comics. Your cloud files are never changed.</p><button id="connect-drive" class="primary-btn full">Connect Google Drive <span>↗</span></button><p class="tiny-muted" id="drive-connect-hint">In-app folder browsing requires Google OAuth. Or choose individual comics below without app OAuth.</p><button id="choose-drive-files" class="outline-btn">Choose comic from Google Drive / Files</button></div>
       <div id="drive-connected" class="hidden"><div class="connected-line"><span class="status-led"></span><span>Google Drive connected</span><button id="disconnect-drive" class="small-plain">Disconnect</button></div><div class="drive-path" id="drive-path"></div><div id="drive-files" class="drive-file-list"></div><div id="drive-empty" class="drive-empty hidden">Nothing here yet. Open a folder containing CBZ or CBR comics.</div></div>
       <div class="tip-box"><b>Another way to import</b><p>If Google Drive appears in iPhone Files, select a comic with the <strong>Add</strong> button without signing in here. Files over 100 MB stream from their local file and must be re-selected after reopening the app.</p></div>
     </section>
@@ -74,7 +74,7 @@
   </div>
 </div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
-<input type="file" id="local-picker" accept=".cbz,.cbr,.cbs,.zip,application/zip,application/vnd.rar,application/x-rar-compressed" multiple hidden>
+<input type="file" id="local-picker" multiple hidden>
 <div id="busy-overlay" class="busy-overlay hidden"><span class="spinner"></span><b id="busy-title">Importing comic…</b><small id="busy-desc">Unpacking pages</small></div>
 <script src="lib/pako_inflate.min.js"></script>
 <script src="zip-reader.js"></script>
